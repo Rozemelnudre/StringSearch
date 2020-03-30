@@ -80,24 +80,36 @@ class KMPmatcher(pattern:String) {
     returnList.iterator
   }
 
-  def findAllSteps(text:String):List[Int] ={
+  def findAllSteps(text:String):List[List[Int]] ={
     var offset:Int = 0
-    var returnTable:List[Int] = List()
+    var start1:Int = 0
+    var end1:Int = 0
+    var matchy:Boolean = false
+    var start2:Int = 0
+    var end2:Int = 0
+    var returnTable:List[List[Int]] = List()
 
     val lookupTable = getPrefixFun()
     var i= 0 // for text
     var j= 0 // for p
 
-    if(this.pattern(0)==text(0)){
-      returnTable :+= offset
+   if(this.pattern(0)==text(0)){
+     offset = 0
+     start1 = 0
     }
 
     while (i < text.length) {
       if (text(i) == this.pattern(j)) {
         i += 1
         j += 1
+        //println(i)
       }
       if (j == this.pattern.length) {
+
+        end1 = j
+        println("new end " + end1)
+
+        matchy = true
         println(s"pattern found at ${i-j}")
         j = lookupTable(j)
 
@@ -109,20 +121,46 @@ class KMPmatcher(pattern:String) {
             //offset = i - j
             //returnTable :+= offset
 
-            j = lookupTable(j)
+            println("here i")
+            println(i)
+            println(j)
+            println("start1 " +start1)
+            if(!matchy){
+              end1 = j
+            }
 
+            println(offset,start1,end1)
+            returnTable :+= List(offset, start1, end1)
+            j = lookupTable(j)
+            println("here j " + j)
+
+            start1 = j
+            println("here offset")
             offset = i - j
-            returnTable :+= offset
+            println(offset)
 
           }else{
-            if(i != text.length - 1){
+
               i+=1
-            }
+              //println(i)
+
+
+            println("here if j is 0")
+            //start1 = j
+            end1 = j
+            println(offset,start1, end1)
+            returnTable :+= List(offset, start1, end1)
+            //i+= 1
+            println("start again")
             offset = i
-            returnTable :+= offset
+            start1 = j
+            println("offset " +offset)
+            println("start1 " + start1)
+
           }
         }
       }
+      //println(i)
     }
     println(returnTable)
     returnTable
