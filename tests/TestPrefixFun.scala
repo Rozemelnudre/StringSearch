@@ -14,13 +14,20 @@ class TestPrefixFun extends FunSuite{
   test("check prefix2") {
     val matcher: KMPmatcher = new KMPmatcher("ABCDE")
     val listy: List[Int] = matcher.getPrefixFun()
-    val hehe = matcher.findAllSteps("MMMMMMABCDE")
+    val hehe = matcher.findAllSteps("MMMMMMABCDEM")
     assert(listy === List(-1, 0, 0, 0, 0, 0))
   }
 
   test("test3"){
     val matchs:KMPmatcher = new KMPmatcher("ABCDABD")
     val checkeris = matchs.findAllSteps("ABC ABCDAB ABCDABCDABDE")
+    val prefix = matchs.getPrefixFun()
+    assert(prefix === List(-1,0,0,0,0,1,2,0))
+  }
+
+  test("test4"){
+    val matchs:KMPmatcher = new KMPmatcher("ABCDABD")
+    val checkeris = matchs.findAllSteps("AAAAAAAAAAAAAAAAB")
     val prefix = matchs.getPrefixFun()
     assert(prefix === List(-1,0,0,0,0,1,2,0))
   }

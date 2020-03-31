@@ -82,89 +82,102 @@ class KMPmatcher(pattern:String) {
 
   def findAllSteps(text:String):List[List[Int]] ={
     var offset:Int = 0
+    var comparisons:Int = 0
     var start1:Int = 0
     var end1:Int = 0
-    var matchy:Boolean = false
-    var start2:Int = 0
     var end2:Int = 0
     var returnTable:List[List[Int]] = List()
 
     val lookupTable = getPrefixFun()
     var i= 0 // for text
-    var j= 0 // for p
+    var j= 0 // for pattern
 
+//initialize start and offset values for the case if the first elements match
    if(this.pattern(0)==text(0)){
      offset = 0
      start1 = 0
     }
 
+    //iterate over the string once
     while (i < text.length) {
       if (text(i) == this.pattern(j)) {
+
+
+        //in case the text ends with incomplete pattern, it won't be recognized and wrong start/end will be added
+        //so it has to be overwritten
+        if(i == text.length - 1){
+
+
+          returnTable = returnTable.init :+ List(offset -1, start1, j)
+
+        }
+        //otherwise increment and move both pattern and string
         i += 1
         j += 1
         //println(i)
+
+
       }
       if (j == this.pattern.length) {
 
-        end1 = j
-        println("new end " + end1)
 
-        matchy = true
+        //if the whole string is matched it has to be added here
+        //because other cases are only added when a mismatch occurs
+        end2 = j
+        returnTable :+= List(i-j,start1,j-1)
+
+
+        //matchy = true
         println(s"pattern found at ${i-j}")
         j = lookupTable(j)
+
+        //move the start to 0 and offset to next i value(which is the current i)
+        start1 = 0
+        offset = i
 
       }
       else {
         if (i < text.length && text(i) != this.pattern(j)) {
+
           if (j != 0) {
+            //sort the two cases-either mismatched after some matched characters
+            //or just another mismatch
 
-            //offset = i - j
-            //returnTable :+= offset
-
-            println("here i")
-            println(i)
-            println(j)
-            println("start1 " +start1)
-            if(!matchy){
-              end1 = j
-            }
-
-            println(offset,start1,end1)
+            //after a mismatch next offset will occur so the previous has ended and
+            //has to be added
+            end1 = j
             returnTable :+= List(offset, start1, end1)
-            j = lookupTable(j)
-            println("here j " + j)
 
+            j = lookupTable(j)
+            //refresh variables to new values to be able to add next offset
             start1 = j
-            println("here offset")
             offset = i - j
-            println(offset)
 
           }else{
-
-              i+=1
-              //println(i)
-
-
-            println("here if j is 0")
-            //start1 = j
+            //similarily-add previous offset and update the values to represent new offset
+            i+=1
             end1 = j
-            println(offset,start1, end1)
             returnTable :+= List(offset, start1, end1)
-            //i+= 1
-            println("start again")
+
+
             offset = i
             start1 = j
-            println("offset " +offset)
-            println("start1 " + start1)
-
           }
         }
       }
-      //println(i)
+
     }
+
+    //calculate all the comparisons
+    for(elem <- returnTable){
+      comparisons += elem(2)-elem(1) + 1
+    }
+    println(comparisons)
     println(returnTable)
     returnTable
   }
+
+
 
   def toJson(text: CharSequence): String={
     "hello"
