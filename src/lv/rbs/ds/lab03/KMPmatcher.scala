@@ -108,7 +108,7 @@ class KMPmatcher(pattern:String) {
         if(i == text.length - 1){
 
 
-          returnTable = returnTable.init :+ List(offset -1, start1, j)
+          returnTable = returnTable.init :+ List(offset -1, start1, j,0)
 
         }
         //otherwise increment and move both pattern and string
@@ -124,7 +124,7 @@ class KMPmatcher(pattern:String) {
         //if the whole string is matched it has to be added here
         //because other cases are only added when a mismatch occurs
         end2 = j
-        returnTable :+= List(i-j,start1,j-1)
+        returnTable :+= List(i-j,start1,j-1,1)
 
 
         //matchy = true
@@ -146,7 +146,7 @@ class KMPmatcher(pattern:String) {
             //after a mismatch next offset will occur so the previous has ended and
             //has to be added
             end1 = j
-            returnTable :+= List(offset, start1, end1)
+            returnTable :+= List(offset, start1, end1,0)
 
             j = lookupTable(j)
             //refresh variables to new values to be able to add next offset
@@ -157,7 +157,7 @@ class KMPmatcher(pattern:String) {
             //similarily-add previous offset and update the values to represent new offset
             i+=1
             end1 = j
-            returnTable :+= List(offset, start1, end1)
+            returnTable :+= List(offset, start1, end1,0)
 
 
             offset = i
