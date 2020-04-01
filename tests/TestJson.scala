@@ -9,7 +9,7 @@ class TestJson extends FunSuite {
 
     val matchs:KMPmatcher = new KMPmatcher("ABCDABD")
     val checkeris = matchs.findAllIn("ABC ABCDAB ABCDABCDABDE")
-    val jsToTest:String = matchs.toJson("ABC ABCDAB ABCDABCDABDE")
+    val jsToTest:String = matchs.toJsonTest("ABC ABCDAB ABCDABCDABDE")
     val jsFromTest:JsValue = Json.parse(jsToTest)
     val comparisons:Int = (jsFromTest\"comparisons").as[Int]
     assert(comparisons == 27)

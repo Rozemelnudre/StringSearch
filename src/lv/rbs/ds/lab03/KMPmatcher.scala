@@ -42,9 +42,12 @@ class KMPmatcher(pattern:String) {
 
         //in case the text ends with incomplete pattern, it won't be recognized and wrong start/end will be added
         //so it has to be overwritten
-        if(i == text.length - 1){
+
+
+        if(i == text.length - 1 && this.pattern.length - 1 != j) {
           returnTable = returnTable.init :+ offset -1
         }
+
 
         //increment and move both pattern and string
         i += 1
@@ -54,12 +57,20 @@ class KMPmatcher(pattern:String) {
 
         //if the whole string is matched it has to be added here
         //because other cases are only added when a mismatch occurs
-        returnTable :+= i-j
+        offset = i - j
+        if(!returnTable.contains(offset)){
+          returnTable :+= offset
+        }
+
+        println("adding when full caught" + (i-j))
         println(s"pattern found at ${i-j}")
         j = lookupTable(j)
 
-        //move the offset to next i value(which is the current i)
-        offset = i
+        //move the offset to next i value(which is the current i or even the last position of already matched string)
+
+          offset = i
+
+
 
       }
       else {
@@ -119,9 +130,7 @@ class KMPmatcher(pattern:String) {
 
         //in case the text ends with incomplete pattern, it won't be recognized and wrong start/end will be added
         //so it has to be overwritten
-        if(i == text.length - 1){
-
-
+        if(i == text.length - 1 && this.pattern.length - 1 != j){
           returnTable = returnTable.init :+ List(offset -1, start1, j,0)
 
         }
@@ -137,8 +146,12 @@ class KMPmatcher(pattern:String) {
 
         //if the whole string is matched it has to be added here
         //because other cases are only added when a mismatch occurs
+
+        if(!returnTable.contains(List(i-j,start1,j-1,1))) {
+          returnTable :+= List(i-j,start1,j-1,1)
+        }
         end2 = j
-        returnTable :+= List(i-j,start1,j-1,1)
+
 
 
         //matchy = true
@@ -148,6 +161,7 @@ class KMPmatcher(pattern:String) {
         //move the start to 0 and offset to next i value(which is the current i)
         start1 = 0
         offset = i
+
 
       }
       else {

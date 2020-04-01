@@ -32,5 +32,12 @@ class TestPrefixFun extends FunSuite{
     assert(prefix === List(-1,0,0,0,0,1,2,0))
   }
 
+  test("test5"){
+    val matchs:KMPmatcher = new KMPmatcher("anna")
+    val checkeris = matchs.findAllIn("annnannanēannanna")
+    val prefix = matchs.getPrefixFun()
+    assert(prefix === List(-1,0,0,0,1))
+  }
+
 
 }
