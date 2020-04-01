@@ -1,6 +1,9 @@
 package lv.rbs.ds.lab03
+import play.api.libs.json.{JsValue, Json}
 
 class KMPmatcher(pattern:String) {
+
+  var algo:String = "KMP"
 
   def getPrefixFun():List[Int] ={
     var len:Int = this.pattern.length
@@ -20,69 +23,11 @@ class KMPmatcher(pattern:String) {
     returnList
   }
 
-  def findAllIn(text:CharSequence):Iterator[Int]={
+
+
+  def findAllIn(text:CharSequence):Iterator[List[Int]] ={
     var offset:Int = 0
-    //var previousFalse:Boolean = true
-    var returnList:List[Int] = List()
-    //returnList :+= offset
-    var textLen:Int = text.length()
-    var patLen:Int = this.pattern.length
-    val prefixTable:List[Int] = getPrefixFun()
 
-    var timesIncr:Int = 0
-    var k:Int = 0
-    for(i <- 0 until textLen){
-
-      while(k > 0 && this.pattern(k)!= text.charAt(i)){
-        if(timesIncr < 1){
-          offset = i - k
-          returnList :+= offset
-          println("first")
-          println(offset)
-          timesIncr += 1
-        }
-        k=prefixTable(k)
-        offset = i - k
-        println("second")
-        println(offset)
-        returnList :+= offset
-        timesIncr+= 1
-
-
-      }
-      if(this.pattern(k) == text.charAt(i)){
-        k += 1
-        timesIncr += 1
-      }
-
-      if(k == patLen){
-        //do smth
-
-        k = prefixTable(k)
-        println("third")
-
-
-        if(i != textLen - 1){
-          offset = i+1
-          returnList :+= offset
-          timesIncr += 1
-        }
-
-      }
-
-      if(timesIncr == 0 && k == 0){
-        offset = i
-        returnList :+= offset
-      }
-      timesIncr = 0
-    }
-    println(returnList)
-    returnList.iterator
-  }
-
-  def findAllSteps(text:String):List[List[Int]] ={
-    var offset:Int = 0
-    var comparisons:Int = 0
     var start1:Int = 0
     var end1:Int = 0
     var end2:Int = 0
@@ -93,14 +38,14 @@ class KMPmatcher(pattern:String) {
     var j= 0 // for pattern
 
 //initialize start and offset values for the case if the first elements match
-   if(this.pattern(0)==text(0)){
+   if(this.pattern(0)==text.charAt(0)){
      offset = 0
      start1 = 0
     }
 
     //iterate over the string once
     while (i < text.length) {
-      if (text(i) == this.pattern(j)) {
+      if (text.charAt(i) == this.pattern(j)) {
 
 
         //in case the text ends with incomplete pattern, it won't be recognized and wrong start/end will be added
@@ -137,7 +82,7 @@ class KMPmatcher(pattern:String) {
 
       }
       else {
-        if (i < text.length && text(i) != this.pattern(j)) {
+        if (i < text.length && text.charAt(i) != this.pattern(j)) {
 
           if (j != 0) {
             //sort the two cases-either mismatched after some matched characters
@@ -169,17 +114,65 @@ class KMPmatcher(pattern:String) {
     }
 
     //calculate all the comparisons
-    for(elem <- returnTable){
-      comparisons += elem(2)-elem(1) + 1
-    }
-    println(comparisons)
+
     println(returnTable)
-    returnTable
+    returnTable.iterator
   }
 
 
 
   def toJson(text: CharSequence): String={
-    "hello"
+    val jspat:JsValue = Json.toJson(this.pattern)
+    val jstext:JsValue = Json.toJson(text.toString)
+    val jsalgo:JsValue = Json.toJson(this.algo)
+
+    var jsprefixlist:List[JsValue] = List()
+    val prefixlist:List[Int] = getPrefixFun()
+    //for each element of prefixFun returned list turn element's index and elemnt to JsValues
+    //add the to a list, turn this list into JsValue, add the JsValue-list to list jsprefixlist
+    for (i <- prefixlist.indices){
+      var smallList:List[JsValue] = List()
+      jsprefixlist :+= Json.toJson(List(Json.toJson(i), Json.toJson(prefixlist(i))))
+    }
+
+    //final prefixlist jsvalue to be added to jsmap
+    val jsonprefixes:JsValue = Json.toJson(jsprefixlist)
+
+    var comparisons:Int = 0
+    val steps:Iterator[List[Int]] = findAllIn(text)
+    //calculate the comparisons
+    for(elem <- steps){
+      comparisons += elem(2)-elem(1) + 1
+    }
+    //jsvalue of comparisons to be added to jsmap
+    val jscomp:JsValue = Json.toJson(comparisons)
+
+
+    var listOfstepMaps:List[JsValue]=List()
+    for(elem<- steps){
+      var smallMap:Map[String,JsValue] = Map(
+        "offset" -> Json.toJson(elem(0)),
+        "start" -> Json.toJson(elem(1)),
+        "end" -> Json.toJson(elem(2)),
+      )
+      if(elem(3) == 1){
+        smallMap += ("match" -> Json.toJson(true))
+      }
+
+      listOfstepMaps :+= Json.toJson(smallMap)
+    }
+    val jsstepList:JsValue = Json.toJson(listOfstepMaps)
+
+    var jsonMap:Map[String, JsValue] = Map(
+      "algorithm" -> jsalgo,
+      "pattern" -> jspat,
+      "text" -> jstext,
+      "prefixFun" -> jsonprefixes,
+      "steps" -> jsstepList,
+      "comparisons" -> jscomp
+    )
+
+
+    Json.stringify(Json.toJson(jsonMap))
   }
 }
