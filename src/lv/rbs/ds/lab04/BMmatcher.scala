@@ -1,11 +1,13 @@
 package lv.rbs.ds.lab04
 
+import scala.collection.mutable.ListBuffer
+
 class BMmatcher(pattern:String) {
 
   def getPrefixFun(pat:String):List[Int] ={
     var len:Int = pat.length
     var returnList:List[Int] = List()
-    //returnList :+= -1
+    returnList :+= -1
     returnList :+= 0
     var k:Int = 0
     for (q <- 2 to len){
@@ -37,22 +39,31 @@ class BMmatcher(pattern:String) {
   }
 
   def getGoodSuffixFun():List[Int] ={
-    var returnList:List[Int] = List()
+    var returnList:ListBuffer[Int] = ListBuffer()
 
     val leng:Int = this.pattern.length
     val prefixList:List[Int] = getPrefixFun(this.pattern)
     val prefixReversed:List[Int] = getPrefixFun(this.pattern.reverse)
 
-    var firstlst:List[Int] = List()
-    for (j <- 0 to this.pattern.length){
-      firstlst :+= leng - prefixList(j)
-    }
-    for (i <- 1 to leng){
+
+    for (j <- 0 to leng){
+      returnList :+= leng - prefixList(leng)
 
     }
+    //returnList :+= firstlst.head
+    for (l <- 1 to leng){
+
+      println(l)
+      val j = leng - prefixReversed(l)
+      println(j)
+      returnList(j) = Math.min(returnList(j), l - prefixReversed(l))
+    }
 
 
-    returnList
+    println(returnList)
+    returnList.toList
   }
+
+
 
 }
