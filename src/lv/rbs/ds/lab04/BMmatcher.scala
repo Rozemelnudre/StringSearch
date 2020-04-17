@@ -23,7 +23,7 @@ val algorithm = "BM"
     returnList
   }
 
-  def getBadCharFun2():List[(Char, Int)] ={
+  def getBadCharFun():List[(Char, Int)] ={
     var toReturn:List[(Char, Int)] = List()
     var checked:List[Char] = List()
 
@@ -36,10 +36,10 @@ val algorithm = "BM"
       }
     }
 
-    toReturn
+    toReturn.sortBy(_._1)
   }
 
-  def getBadCharFun():Map[Char, Int] ={
+  def getBadCharFun2():Map[Char, Int] ={
     var toReturn:Map[Char, Int] = Map()
     var checked:List[Char] = List()
 
@@ -81,13 +81,46 @@ val algorithm = "BM"
     returnList.toList
   }
 
-
-
   def findAllIn(text:CharSequence):Iterator[Int] ={
     var returnList:List[Int] = List()
     val textlen:Int = text.length()
     val patlen:Int = this.pattern.length
-    val badCharMap:Map[Char,Int] = this.getBadCharFun()
+    val badCharMap:Map[Char,Int] = this.getBadCharFun2()
+    val goodSuff:List[Int] = getGoodSuffixFun()
+
+    var s:Int = 0
+    var j:Int = 0
+    while(s <= textlen - patlen){
+      j = patlen
+      while(j > 0 && this.pattern(j - 1) == text.charAt(s + j - 1)){
+        j -= 1
+      }
+      if(j == 0){
+
+        returnList :+= s
+        println("pattern appears with offset " + s)
+        s = s + goodSuff.head
+
+
+      }else{
+        //returnList :+= s
+        // s before incrementing is the old offset
+        s = s + Math.max(goodSuff(j), j - 1 - badCharMap.getOrElse(text.charAt(s + j - 1), -1))
+
+        //println("new s " + s)
+      }
+    }
+
+    println(returnList)
+    println("here at the shortened ver")
+    returnList.iterator
+  }
+
+  def findAllIn2(text:CharSequence):Iterator[Int] ={
+    var returnList:List[Int] = List()
+    val textlen:Int = text.length()
+    val patlen:Int = this.pattern.length
+    val badCharMap:Map[Char,Int] = this.getBadCharFun2()
     val goodSuff:List[Int] = getGoodSuffixFun()
 
     var s:Int = 0
@@ -121,7 +154,7 @@ val algorithm = "BM"
     var returnList:List[List[Int]] = List()
     val textlen:Int = text.length()
     val patlen:Int = this.pattern.length
-    val badCharMap:Map[Char,Int] = this.getBadCharFun()
+    val badCharMap:Map[Char,Int] = this.getBadCharFun2()
     val goodSuff:List[Int] = getGoodSuffixFun()
 
     var s:Int = 0

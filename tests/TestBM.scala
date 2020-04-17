@@ -8,7 +8,9 @@ class TestBM extends FunSuite{
 
     val metcher:BMmatcher = new BMmatcher("ABCDABD")
 
-    metcher.findAllIn("ABC ABCDAB ABCDABCDABDE")
+    println("printing findaal short")
+
+    println(metcher.findAllIn("ABC ABCDAB ABCDABCDABDE"))
     metcher.findAllSteps("ABC ABCDAB ABCDABCDABDE")
   }
 
